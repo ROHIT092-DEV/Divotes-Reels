@@ -44,21 +44,31 @@ export default function ReelsPage() {
             caption: r.caption ?? '',
             createdBy: r.createdBy ?? 'Anonymous',
             // normalize comments: legacy string -> object
-            comments: (r.comments ?? []).map((c: any) =>
+            comments: (r.comments ?? []).map((c: unknown) =>
               typeof c === 'string'
                 ? { userName: '', text: c }
                 : {
-                    userId: c.userId,
-                    userName: c.userName,
-                    text: c.text,
-                    createdAt: c.createdAt,
+                    userId: (c as Record<string, unknown>)['userId'] as
+                      | string
+                      | undefined,
+                    userName: (c as Record<string, unknown>)['userName'] as
+                      | string
+                      | undefined,
+                    text: (c as Record<string, unknown>)['text'] as string,
+                    createdAt: (c as Record<string, unknown>)['createdAt'] as
+                      | string
+                      | Date
+                      | undefined,
                   }
             ),
             likes: r.likes ?? 0,
-            hasLiked:
-              (r as any).likedBy && user
-                ? ((r as any).likedBy || []).includes(user.id)
-                : false,
+            hasLiked: (() => {
+              const likedBy = (r as Record<string, unknown>)['likedBy'];
+              if (Array.isArray(likedBy) && user) {
+                return (likedBy as unknown[]).includes(user.id as unknown);
+              }
+              return false;
+            })(),
           }))
         )
       )
@@ -187,10 +197,10 @@ export default function ReelsPage() {
       body: JSON.stringify(payload),
     })
       .then((res) => res.json())
-      .then((data) => {
+        .then((data) => {
         // Replace comments with server response (ensure normalized shape)
-        const serverComments = (data.comments ?? []).map((c: any) =>
-          typeof c === 'string' ? { userName: '', text: c } : c
+        const serverComments = (data.comments ?? []).map((c: unknown) =>
+          typeof c === 'string' ? { userName: '', text: c } : (c as Record<string, unknown>)
         );
         setReels((prev) =>
           prev.map((r) =>

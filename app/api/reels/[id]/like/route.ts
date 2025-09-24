@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import Reel from '@/models/Reel';
 import { connectDB } from '@/lib/mongodb';
 
-export async function POST(req: Request, context: { params: any }) {
+export async function POST(req: Request, context: { params: unknown }) {
   try {
     await connectDB();
     const params = await context.params;

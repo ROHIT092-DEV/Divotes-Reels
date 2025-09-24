@@ -17,10 +17,11 @@ export async function GET() {
     const reels = await Reel.find().sort({ createdAt: -1 }).lean();
 
     // Normalize older documents that may not have likes/comments
-    const normalized = (reels as any[]).map((r) => ({
+    type RawReel = Record<string, unknown>;
+    const normalized = (reels as unknown as RawReel[]).map((r) => ({
       ...r,
-      likes: typeof r.likes === 'number' ? r.likes : 0,
-      comments: Array.isArray(r.comments) ? r.comments : [],
+      likes: typeof r['likes'] === 'number' ? (r['likes'] as number) : 0,
+      comments: Array.isArray(r['comments']) ? (r['comments'] as unknown[]) : [],
     }));
 
     return NextResponse.json(normalized, { status: 200 });
