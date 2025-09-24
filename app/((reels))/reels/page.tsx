@@ -197,10 +197,12 @@ export default function ReelsPage() {
       body: JSON.stringify(payload),
     })
       .then((res) => res.json())
-        .then((data) => {
+      .then((data) => {
         // Replace comments with server response (ensure normalized shape)
         const serverComments = (data.comments ?? []).map((c: unknown) =>
-          typeof c === 'string' ? { userName: '', text: c } : (c as Record<string, unknown>)
+          typeof c === 'string'
+            ? { userName: '', text: c }
+            : (c as Record<string, unknown>)
         );
         setReels((prev) =>
           prev.map((r) =>

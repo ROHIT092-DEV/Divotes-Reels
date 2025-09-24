@@ -21,7 +21,9 @@ export async function GET() {
     const normalized = (reels as unknown as RawReel[]).map((r) => ({
       ...r,
       likes: typeof r['likes'] === 'number' ? (r['likes'] as number) : 0,
-      comments: Array.isArray(r['comments']) ? (r['comments'] as unknown[]) : [],
+      comments: Array.isArray(r['comments'])
+        ? (r['comments'] as unknown[])
+        : [],
     }));
 
     return NextResponse.json(normalized, { status: 200 });
